@@ -11,6 +11,7 @@ import com.demo.poc.repository.UserRepository;
 import com.demo.poc.service.UserService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @AllArgsConstructor
@@ -65,6 +67,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<UserDto> getUsersWithPagination(Pageable page) {
+        Iterable<User> users = userRepository.findAll(page);
+        return StreamSupport.stream(users.spliterator(), false)
+                .map(UserMapper::mapToUserDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
     public UserDto updateUser(UserDto userDto) {
         User existingUser = userRepository.findById(userDto.getId()).get();
         existingUser.setFirstName(userDto.getFirstName());
@@ -78,7 +89,7 @@ public class UserServiceImpl implements UserService {
         existingAddress.setPincode(userDto.getPincode());
 
         existingUser.setAddress(existingAddress);
-
+        this.addressService.addAddress(existingAddress);
         User updatedUser = userRepository.save(existingUser);
         return UserMapper.mapToUserDto(updatedUser);
     }

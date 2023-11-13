@@ -13,10 +13,10 @@ public class UserMapper {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                user.getAddress().getStreetName(),
-                user.getAddress().getCityName(),
-                user.getAddress().getState(),
-                user.getAddress().getPincode()
+                user.getAddress() != null ? user.getAddress().getStreetName() : null,
+                user.getAddress() != null ? user.getAddress().getCityName() : null,
+                user.getAddress() != null ? user.getAddress().getState() : null,
+                user.getAddress() != null ? user.getAddress().getPincode() : null
         );
         return userDto;
     }
